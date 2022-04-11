@@ -1,3 +1,3 @@
 # The-Journey-of-Java
 
-个人在Java技术栈上的学习旅程
+个人在Java技术栈上的学习过程
