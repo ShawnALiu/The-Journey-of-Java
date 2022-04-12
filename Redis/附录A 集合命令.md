@@ -93,15 +93,34 @@
 
 # 6.发布与订阅命令
 
+订阅者(listener)负责订阅频道(channel)。
+
+发送者(publisher)负责向频道发送二进制字符串消息(binary string message)。
+
 |命令|行为|示例|
 |----|---|----|
-||||
-||||
+|SUBSCRIBE|订阅一个或多个频道|subscribe channel1 [channel2 ...]|
+|UNSUBSCRIBE|退订一个或多个频道。若没有给定任何频道，则退订所有|unsubscribe [channel1 [channel2 ...]]|
+|PUBLISH|向给定频道发送消息|publish channel msg|
+|PSUBSCRIBE|订阅与给定模式相匹配的所有频道|psubscribe pattern1 [pattern2 ...]|
+|PUNSUBSCRIBE|退订给定的模式。若没有给定任何模式，则退订所有|punsubscribe [pattern1 [pattern2 ...]]|
+
+不建议使用：
+
+1.影响Redis系统稳定性。旧版Redis，如果客户端读取消息太慢，消息积压将导致Redis变慢，甚至崩溃。新版Redis不会出现这个问题，它会自动断开不符合client-output-buffer-limit publish 选项的客户端。
+
+2.数据传输的可靠性。客户端断线，将会都是期间所有消息。
 
 # 7.其他命令
+
+## 7.1 删除key
 
 |命令|行为|示例|
 |----|---|----|
 |DEL|删除存储在给定键中的值|del key|
-||||
-||||
+
+## 7.2 排序SORT
+
+|命令|行为|示例|
+|----|---|----|
+|SORT|根据给定的选项，对列表、集合、有序集合进行排序，然后返回或者存储排序结果|sort src-key [by pattern] [limit offset count] [get pattern1 [get pattern2 ...]] [asc\|desc] [alpha] [store dest-key]|
