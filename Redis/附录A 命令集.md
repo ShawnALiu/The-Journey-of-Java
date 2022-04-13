@@ -3,7 +3,7 @@
 
 |命令|行为|示例|
 |----|---|----|
-|SET|设置存储在给定键中的值|set string-key value|
+|SET|设置存储在给定键中的值。EX:过期时间，秒。PX:过期时间，毫秒。NX:只有键key不存在的时候才会设置key的值。XX:只有键key存在的时候才会设置key的值|set string-key value [EX seconds] [PX milliseconds] [NX\|XX]|
 |GET|获取存储在给定键中的值|get string-key|
 |INCR|将键值存储的值(必须是整数)加1|incr string-key|
 |DECR|将键值存储的值(必须是整数)减1|decr string-key|
@@ -91,7 +91,19 @@
 |ZINCRBY|将member成员的分值加上amount|zincrby zset-key amount member|
 |ZREM|如果给定成员存在于有序集合，则移除该成员|zrem zset-key member|
 
-# 6.发布与订阅命令
+## 6.过期时间
+
+|命令|行为|示例|
+|----|---|----|
+|PERSIST|移除键的过期时间|persist key|
+|TTL|查看给定键距离过期还剩多少秒|ttl key|
+|EXPIRE|让给定键在指定的秒数之后过期|expire key seconds|
+|EXPIREAT|将给定键的过期时间设定为给定的UNIX时间戳|expireat key timestamp|
+|PTTL|查看给定键距离过期时间还有多少毫秒|pttl key|
+|PEXPIRE|让给定键在指定的毫秒数之后过期|pexpire key milliseconds|
+|PEXPIREAT|将给定键的过期时间设定为给定的毫秒级精度的UNIX时间戳|pexpireat key timestamp-milliseconds|
+
+# 7.发布与订阅命令
 
 订阅者(listener)负责订阅频道(channel)。
 
@@ -111,15 +123,18 @@
 
 2.数据传输的可靠性。客户端断线，将会都是期间所有消息。
 
-# 7.其他命令
+示例：
+![](../assets/images/Redis/A/1.bmp)
 
-## 7.1 删除key
+# 8.其他命令
+
+## 8.1 删除key
 
 |命令|行为|示例|
 |----|---|----|
 |DEL|删除存储在给定键中的值|del key|
 
-## 7.2 排序SORT
+## 8.2 排序SORT
 
 |命令|行为|示例|
 |----|---|----|
