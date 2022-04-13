@@ -86,8 +86,8 @@
 |ZREVRANGE|分值由大到小排列时，获取有序集合在给定位置的所有值(包含范围边界)，|zrevrange zset-key min max|
 |ZRANGEBYSCORE|获取有序集合在给定分值范围内的所有元素(包含范围边界)|zrangebyscore zset-key min max|
 |ZREVRANGEBYSCORE|分值由大到小排列时，获取有序集合在给定分值范围内的所有元素(包含范围边界)|zrevrangebyscore zset-key max min|
-|ZREMRANGEBYRANK|移除有序集合中排名介于start和end之间的成员|zremrangebyrank zset-key start end|
-|ZREMRANGEBYSCORE|移除有序集合中分值介于min和max之间的成员|zremrangebyscore zset-key min max|
+|ZREMRANGEBYRANK|移除有序集合中排名介于start和end之间的成员(包含范围边界)|zremrangebyrank zset-key start end|
+|ZREMRANGEBYSCORE|移除有序集合中分值介于min和max之间的成员(包含范围边界)|zremrangebyscore zset-key min max|
 |ZINTERSTORE|交集，并保存在dest-key中|zinterstore dest-key key-count key1 [key2 ...] [WEIGHTS weight1 [weight2 ...]] [AGGREGATE SUM\|MIN\|MAX]|
 |ZUNIONSTORE|并集，并保存在dest-key中|zunionstore dest-key key-count key1 [key2 ...] [WEIGHTS weight1 [weight2 ...]] [AGGREGATE SUM\|MIN\|MAX]|
 |ZINCRBY|将member成员的分值加上amount|zincrby zset-key amount member|
