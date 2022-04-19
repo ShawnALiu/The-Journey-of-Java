@@ -123,7 +123,7 @@
 
 1.影响Redis系统稳定性。旧版Redis，如果客户端读取消息太慢，消息积压将导致Redis变慢，甚至崩溃。新版Redis不会出现这个问题，它会自动断开不符合client-output-buffer-limit publish 选项的客户端。
 
-2.数据传输的可靠性。客户端断线，将会都是期间所有消息。
+2.数据传输的可靠性。客户端断线，将会丢失期间所有消息。
 
 示例：
 ![](../assets/images/Redis/A/1.bmp)
