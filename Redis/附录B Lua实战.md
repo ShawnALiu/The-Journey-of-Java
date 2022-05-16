@@ -3,9 +3,11 @@
 
 # 2 Lua实现Redis分布式锁
 
+为了对Redis存储的数据进行排他性访问，客户端需要先访问一个锁。这个锁定义在Redis服务器中，恰好能让各个客户端看见。
+
 ## 2.1 加锁
 
-如果键存在，则返回0；如果不存在，则设置键和值，并设置过期时间，返回1。该操作是原子操作，可以由等效命令 set key value nx ex time代替。
+如果键存在，则返回0；如果不存在，则设置键和值，并设置过期时间，返回1。该操作是原子操作，可以由等效命令 set key value nx ex seconds代替。
 
 Lua脚本如下：
 
@@ -55,4 +57,3 @@ eval "local v = redis.call('get',KEYS[1]);if v then if v~=ARGV[1] then return 0;
 ## 2.3 示例
 
 ![](../assets/images/Redis/B/1.png)
-
