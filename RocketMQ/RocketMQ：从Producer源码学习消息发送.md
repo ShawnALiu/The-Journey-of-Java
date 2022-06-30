@@ -49,7 +49,7 @@ public class Producer {
 
 ![](../assets/images/RocketMQ/5/StepOfMessageSend.png)
 
-# 1 RocketMQ 消息
+# 2 RocketMQ 消息
 
 RocketMQ 的消息通过 Message 类（`org.apache.rocketmq.common.message.Message`）承载，其源码如下:
 
@@ -79,7 +79,7 @@ public class Message implements Serializable {
 - tag：消息TAG，可以用于消息过滤。
 - keys: Message索引键，RocketMQ可根据key快速检索消息。如订单号为key，快速找到该订单对应的消息。
 
-# 2 RocketMQ 生产者
+# 3 RocketMQ 生产者
 
 生产者负责消息的发送，RocketMQ 有如下几种生产者：
 
@@ -89,7 +89,7 @@ public class Message implements Serializable {
 
 因此，我们可以从默认生产者 DefaultMQProducer 类来了解生产者的基本功能。
 
-## 2.1 DefaultMQProducer 类
+## 3.1 DefaultMQProducer 类
 
 DefaultMQProducer 继承了 ClientConfig 类（`org.apache.rocketmq.client.ClientConfig`），因此生产者也具有客户端的通用属性。另外还实现了 MQProducer(继承了MQAdmin接口)接口。
 
@@ -145,11 +145,11 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
 
 我们在创建生产者的时候，可以根据实际需求，通过 set 方法，去设置生产者的各种属性。
 
-## 2.2 生产者的通用能力
+## 3.2 生产者的通用能力
 
-### 2.2.1 父类 ClientConfig
+### 3.2.1 父类 ClientConfig
 
-ClientConfig 类为客户端公共配置，每个参数都可以用 spring 来配置，也可以在代码中配置。其中，我们需要关注到 namespace 参数，该参数将发送者、消费者编入到一个命名空间中，方便支持多环境、多标签、全链路压测场景。
+ClientConfig 类为客户端公共配置，每个参数都可以用 spring 来配置，也可以在代码中配置。其中，我们需要关注到 namespace 参数，该参数将发送者、消费者编入到一个命名空间中，以支持多环境的测试场景。
 
 ```java
 public class ClientConfig {
@@ -167,7 +167,7 @@ public class ClientConfig {
 }
 ```
 
-### 2.2.2 MQProducer 接口
+### 3.2.2 MQProducer 接口
 
 提供消息发送基本能力。
 
@@ -181,7 +181,7 @@ public class ClientConfig {
 |void start()|启动发送者，在进行消息发送之前必须先调用该方法|
 |void shutdown()|关闭发送者，如果不需要再使用该生产者，需要调用该方法释放资源|
 
-### 2.2.3 MQAdmin 接口
+### 3.2.3 MQAdmin 接口
 
 MQ 基本的管理接口，对 MQ 提供基础的管理能力。
 
@@ -196,9 +196,9 @@ MQ 基本的管理接口，对 MQ 提供基础的管理能力。
 |MessageExt viewMessage(String topic, String msgld)|根据主题与消息 ID 查找消息|
 |QueryResult queryMessage(String topic, String key, int maxNum, Iong begin, long end)|根据条件批量查询消息|
 
-# 3 生产者的启动
+# 4 生产者的启动
 
-生产者的启动调用的是 `DefaultMQProducer` 的 start() 方法，其真正的启动在于内部实现类 `defaultMQProducerImpl` 的 start() 方法。
+生产者的启动调用的是 `DefaultMQProducer` 的 start() 方法。
 
 ```java
 public void start() throws MQClientException {
@@ -225,7 +225,7 @@ public void start() throws MQClientException {
 
 ![](../assets/images/RocketMQ/5/3.png)
 
-## 3.1 DefaultMQProducerlmpl 的 start() 方法
+## 4.1 DefaultMQProducerlmpl 的 start() 方法
 
 `DefaultMQProducerlmpl`是生产者`DefaultMQProducer`内部默认的实现类，其`start()`方法封装了生产者的启动细节。
 
@@ -293,9 +293,9 @@ public void start(final boolean startFactory) throws MQClientException {
 }
 ```
 
-## 3.2 客户端 MQClientInstance
+## 4.2 客户端 MQClientInstance
 
-在3.1节Step 4中，生产者在启动时，会通过`MQClientManager`类获取客户端实例`MQClientInstance`，并且向这个实例注册自己，方便后续调用网络请求、进行心跳检测等。
+在4.1节Step 4中，生产者在启动时，会通过`MQClientManager`类获取客户端实例`MQClientInstance`，并且向这个实例注册自己，方便后续调用网络请求、进行心跳检测等。
 
 ```java
 public class MQClientManager {
@@ -309,7 +309,7 @@ public class MQClientManager {
 
 `MQClientManager`是个单例类，类里创建了一个缓存表，用来存储`MQClientInstance`，并且根据`clientId`复用`MQClientInstance`。`clientld` = 客户端`IP` + 实例名`instanceName` + (`unitname` 可选），其中，实例名`instanceName`为进程ID。如果在同一个应用程序里启动多个生产者，在未设置`unitname`时，则`clientld`相同，即多个生产者将会共用一个`MQClientInstance`实例。这样做的原因在于`MQClientInstance`实现的是底层通信功能和获取并保存元数据的功能，没必要每个`Producer`都创建一个对象，因此一个`MQClientInstance`对象可以被多个`Producer`共用。
 
-获取到`MQClientManager`后，在3.1节Step 7，如果客户端没有启动，则调用`start()`方法启动客户端。通过`start()`方法的源码，我们可以知道，`MQClientManager`的功能。
+获取到`MQClientInstance`后，在3.1节Step 7，如果客户端没有启动，则调用`start()`方法启动客户端。通过`start()`方法的源码，我们可以知道，`MQClientInstance`的功能。
 
 ```java
 public void start() throws MQClientException {
@@ -360,19 +360,19 @@ public void start() throws MQClientException {
 }
 ```
 
-# 4 消息发送
+# 5 消息发送
 
-## 4.1 消息发送方式
+## 5.1 消息发送方式
 
 RocketMQ支持3种消息发送方式：单向（oneway）、同步（sync ）、异步（async）。
 
-- 单向（oneway）：发送者发送消息后，直接返回，不等待消息服务器的结果，也不注册回调函数，简单地说，就是只管发，不在乎消息是否成功存储在消息服务器上。用于发送一些不太重要的消息，例如操作日志，偶然出现消息丢失对业务无影响。
+- 单向（oneway）：发送消息后，将直接返回，不再等待发送结果，也没有回调函数。用于发送一些偶尔出现消息丢失，但是对业务不会造成太大影响的消息。
 
-- 同步（sync ）：发送者发送消息时，同步等待，直到消息服务器返回发送结果。对不特别追求消息发送速度，但消息可靠性要求高的场景。
+- 同步（sync ）：发送消息后，同步等待服务器的返回结果。适用于不过分追求发送速度，但要求消息可靠性高的场景。
 
-- 异步（async）：发送者先指定回调函数，发送完消息后，立即返回，消息发送者线程不阻塞，直到运行结束，消息发送成功或失败的回调任务在一个新的线程中执行。对消息发送速度要求快，消息可靠性要求低的场景。
+- 异步（async）：发送者指定回调函数，在消息发送完后，立即返回，继续运行，直到结束。消息发送成功或失败后，指定的回调任务将开启新线程执行。适用于要求发送速度快，但不过分追求消息可靠性的场景。
 
-# 4.2 消息发送步骤
+# 5.2 消息发送步骤
 
 主要的步骤：验证消息、查找路由、消息发送（包含异常处理机制）。
 
@@ -483,11 +483,12 @@ private SendResult sendDefaultImpl(
 }
 ```
 
-## 4.3 内核消息发送
+## 5.3 内核消息发送
 
-`org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#sendKernelImpl`：
+在5.2节的step4.3，消息准备工作做完后，将使用内核消息发送。
 
 ```java
+//org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#sendKernelImpl
 private SendResult sendKernelImpl(final Message msg,
                                       final MessageQueue mq,
                                       final CommunicationMode communicationMode,
@@ -687,13 +688,13 @@ org.apache.rocketmq.remoting.netty.NettyRemotingClient#invokeAsync
 org.apache.rocketmq.remoting.netty.NettyRemotingClient#invokeSync
 ```
 
-## 4.4 消息发送高可用分析
+## 5.4 消息发送高可用分析
 
-## 4.4.1 缓存`topic`的发布信息
+## 5.4.1 缓存`topic`的发布信息
 
 `topic`的发布信息存放在 TopicPublishInfo 类（`org.apache.rocketmq.client.impl.producer.TopicPublishInfo`）中，该类存储了是否是顺序消息、`topic`对应的的消息队列、用于选择消息队列的自增值、`topic`路由信息等。
 
-在4.2节 step3中，生产者内部实现类在发送消息前，使用`tryToFindTopicPublishInfo()`方法取查找`topic`的发布信息。可以看到，为了更快速的获取，该类在内部使用了一个Map来缓存`topic`发布信息。查找时，如果缓存没有，则从`NameServer`查询该`topic`的发布信息。
+在5.2节 step3中，生产者内部实现类在发送消息前，使用`tryToFindTopicPublishInfo()`方法取查找`topic`的发布信息。可以看到，为了更快速的获取，该类在内部使用了一个Map来缓存`topic`发布信息。查找时，如果缓存没有，则从`NameServer`查询该`topic`的发布信息。
 
 ```java
 //`org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#tryToFindTopicPublishInfo`
@@ -721,13 +722,13 @@ private TopicPublishInfo tryToFindTopicPublishInfo(final String topic) {
 }
 ```
 
-## 4.4.2 消息发送失败重投机制
+## 5.4.2 消息发送失败重投机制
 
-重试机制作用的地方，需要根据消息发送模式来查看。
+重试机制作用的地方，需要根据发送模式来查看。
 
 （1）同步发送
 
-在4.2节step4.1中，会通过同步消息发送失败重试次数`DefaultMQProducer#retryTimesWhenSendFailed`来设置消息循环发送次数，该参数在2.1节介绍`DefaultMQProducer`类时提过，可以通过set方法设置。
+在5.2节step4.1中，会通过同步消息发送失败重试次数`DefaultMQProducer#retryTimesWhenSendFailed`来设置消息循环发送次数，该参数在2.1节介绍`DefaultMQProducer`类时提过，可以通过set方法设置。
 
 在step4.6中，消息结果的状态不等于`SendStatus.SEND_OK`，将会继续循环重试。
 
@@ -735,9 +736,9 @@ private TopicPublishInfo tryToFindTopicPublishInfo(final String topic) {
 
 在异步发送时，捕获到异常或者`RemotingCommand==null`时，均会触发消息重投。具体实现可阅读`org.apache.rocketmq.client.impl.MQClientAPIImpl#onExceptionImpl`类源码。
 
-## 4.4.3 Broker 故障延迟机制
+## 5.4.3 Broker 故障延迟机制
 
-在4.2节的step4.2中，消息发送前，通过`MQFaultStrategy#selectOneMessageQueue()`方法，选择消息将要发送至的消息队列。
+在5.2节的step4.2中，消息发送前，通过`MQFaultStrategy#selectOneMessageQueue()`方法，选择消息将要发送至的消息队列。
 
 考虑`Broker`宕机的场景，如果上一次消息发送失败，选择的是宕机的`Broker`的某个队列，那么在轮询的过程中，可能连续找到的队列都是宕机`Broker`上的，为了避免轮询时出现这种情况，将会直接从规避的`Broker`缓存中，随机取出一个`Broker`。用户可以通过设置开关`MQFaultStrategy#sendLatencyFaultEnable`，来使用`Broker`的故障延迟机制。
 
@@ -800,7 +801,7 @@ public MessageQueue selectOneMessageQueue(final TopicPublishInfo tpInfo, final S
 }
 ```
 
-# 5 消息发送结果
+# 6 消息发送结果
 
 异步、单向（oneway）返回结果都为 null，只有同步发送消息才会返回结果，处理类为 `org.apache.rocketmq.client.impl.MQClientAPIImpl#processSendResponse`。
 
