@@ -145,7 +145,7 @@ elseif redis.call("ZCARD", rankKey) >= rankSize then      -- （2）不在排行
         redis.call("ZADD", rankKey, sumNum, openid)
     end
 else                                                       -- （3）不在排行榜，且排行榜未满 -> 直接加入
-    redis.call("ZADD", rankKey, addNum, openid)
+    redis.call("ZADD", rankKey, sumNum, openid)
 end
 
 -- 4、更新领取状态
