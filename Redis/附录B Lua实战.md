@@ -58,7 +58,7 @@ eval "local v = redis.call('get',KEYS[1]);if v then if v~=ARGV[1] then return 0;
 
 ## 2.3 示例
 
-![](../assets/images/Redis/B/1.png)
+![](./images/B/1.png)
 
 # 3 Lua更新多个key
 
