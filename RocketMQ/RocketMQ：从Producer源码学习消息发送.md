@@ -811,3 +811,14 @@ RocketMQ 消息发送的返回结果有如下几种：
 
 （2）事务消息发送返回结果 TransactionSendResult 类，继承了 SendResult，`org.apache.rocketmq.client.producer.TransactionSendResult`。
 
+# 7 总结
+
+本文以RocketMQ官方Demo为切入点，结合核心源码，介绍了生产者整个的消息发送过程。在学习后，我们要掌握：
+
+（1）消息体、生产者的相关属性与设置方法，即了解RocketMQ消息发送时，对外提供的关键能力。
+
+（2）生产者启动步骤，关键在于通过 MQClientManager 类获取客户端实例 MQClientInstance，并且向这个实例注册自己，用于后续更新相关信息。
+
+（3）消息发送时的高性能、高可用措施：缓存 Topic信息、失败重试、Broker 故障延迟等机制。
+
+（4）消息发送完，只有同步消息才会返回结果。
